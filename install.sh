@@ -40,8 +40,9 @@ installed=0
 opkg_php8=$(opkg list-installed | grep php8)
 opkg_php8_cgi=$(opkg list-installed | php8-cgi)
 opkg_php8_cli=$(opkg list-installed | php8-cli)
+opkg_jq=$(opkg list-installed | jq)
 #Если какой то пакет не установился выдаём ошибку
-if [ -z "$opkg_php8" -o -z "$opkg_php8_cgi" -o -z "$opkg_php8_cli" ]; then
+if [ -z "$opkg_php8" -o -z "$opkg_php8_cgi" -o -z "$opkg_php8_cli" -o "$opkg_jq" ]; then
 	echo ""
 	echo "Некоторые пакеты не установились, ошибка...попробуйте снова..."
 	exit 0
