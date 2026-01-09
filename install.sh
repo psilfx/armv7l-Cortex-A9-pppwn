@@ -2,7 +2,7 @@
 
 WEB_BASE_DIR=$(pwd)
 WEB_CONFIG_FILE="pppwn.config.json"
-WEB_OPKG_INSTALL="git git-http python3 jq"
+WEB_OPKG_INSTALL="php8 php8-cgi php8-cli jq"
 PPPWN_BINARY_FILE="pppwn"
 FW_VERSION=1100
 
@@ -37,11 +37,11 @@ opkg update
 opkg install "$WEB_OPKG_INSTALL"
 #Проверяме установку
 installed=0
-opkg_git=$(opkg list-installed | grep git)
-opkg_git_http=$(opkg list-installed | grep git-http)
-opkg_git_python=$(opkg list-installed | grep python)
+opkg_php8=$(opkg list-installed | grep php8)
+opkg_php8_cgi=$(opkg list-installed | php8-cgi)
+opkg_php8_cli=$(opkg list-installed | php8-cli)
 #Если какой то пакет не установился выдаём ошибку
-if [ -z opkg_git -o -z opkg_git_http -o -z opkg_git_python ]; then
+if [ -z "$opkg_php8" -o -z "$opkg_php8_cgi" -o -z "$opkg_php8_cli" ]; then
 	echo ""
 	echo "Некоторые пакеты не установились, ошибка...попробуйте снова..."
 	exit 0
@@ -80,8 +80,7 @@ echo ""
 echo "Сетевой интерфейс: $selected_interface"
 echo ""
 echo "Создаём файл конфига..."
-file_created=$(test -f "$WEB_CONFIG_FILE" && echo 1)
-if [ "$file_created" = "1" ]; then
+if [ -f "$WEB_CONFIG_FILE" ]; then
 	rm "$WEB_BASE_DIR/$WEB_CONFIG_FILE"
 	echo "Старый конфиг был удалён..."
 fi
@@ -92,26 +91,24 @@ cat > "$WEB_CONFIG_FILE" << EOF
     "fwversion": "$FW_VERSION"
 }
 EOF
-file_created=$(test -f "$WEB_CONFIG_FILE" && echo 1)
-if [ "$file_created" != "1" ]; then
+if [ ! -f "$WEB_CONFIG_FILE" ]; then
 	echo "Ошибка...$WEB_BASE_DIR/$WEB_CONFIG_FILE"
 fi
 echo "Запись в $WEB_BASE_DIR/$WEB_CONFIG_FILE успешно..."
 #Копируем нужные файлы в систему
 echo ""
 echo "Работаем с файлами..."
+mkdir -p /opt/bin /opt/etc
 #Копируем главный бинарь
-pppwn_bin_exists=$(test -f "/opt/bin/$PPPWN_BINARY_FILE" && echo 1)
-if [ "$pppwn_bin_exists" != "1" ]; then
+if [ ! -f "/opt/bin/$PPPWN_BINARY_FILE" ]; then
 	echo "Копируем бинарник в /opt/bin/$PPPWN_BINARY_FILE..."
-	mv "$WEB_BASE_DIR/install/$PPPWN_BINARY_FILE" "/opt/bin/"
+	cp "$WEB_BASE_DIR/install/$PPPWN_BINARY_FILE" "/opt/bin/"
 	chmod +x "/opt/bin/$PPPWN_BINARY_FILE"
 else
 	echo "Pppwn бинарник уже существует /opt/bin/$PPPWN_BINARY_FILE..."
 fi
 #Копируем конфиг
-config_exists=$(test -f "/opt/etc/$WEB_CONFIG_FILE" && echo 1)
-if [ "$config_exists" = "1" ]; then
+if [ -f "/opt/etc/$WEB_CONFIG_FILE" ]; then
 	echo "Конфиг уже существует в /opt/etc/$WEB_CONFIG_FILE...перезапишем..."
 	rm "/opt/etc/$WEB_CONFIG_FILE"
 fi
@@ -121,11 +118,17 @@ echo "Копируем новый файл в /opt/etc/$WEB_CONFIG_FILE..."
 service_exists=$(test -f "/opt/etc/pppwn_ctl" && echo 1)
 if [ "$service_exists" != "1" ]; then
 	echo "Служба усрешно установлена..."
-	mv "$WEB_BASE_DIR/install/pppwn_ctl" "/opt/etc/"
+	cp "$WEB_BASE_DIR/install/pppwn_ctl" "/opt/etc/"
 	chmod +x "/opt/etc/pppwn_ctl"
 else
 	echo "Служба уже установлена..."
 fi
 echo ""
-echo "Всё отлично...Выход"
+echo "========================================"
+echo "Установка завершена успешно!"
+echo "Сетевой интерфейс: $selected_interface"
+echo "Версия прошивки: $FW_VERSION"
+echo "========================================"
+echo ""
+echo -e "Для запуска веб морды: \033[1;33msh /opt/etc/pppwn_ctl web_start\033[1;37m"
 exit 0

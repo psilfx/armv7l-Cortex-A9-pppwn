@@ -7,6 +7,7 @@ APP_LAN_INTERFACE=
 APP_FW_VERSION=
 APP_PID_FILE="/opt/var/run/pppwn.pid"
 APP_LOG_FILE="/opt/var/log/pppwn.log"
+APP_SERVER_PORT=9590
 #Понты
 COLOR_GREEN='\033[0;32m'
 COLOR_WHITE='\033[1;37m'
@@ -94,14 +95,14 @@ help()
     echo "  restart   - Перезапустить"
     echo "  status    - Показать статус"
     echo -e "$COLOR_GREEN" "Команды для Web: $COLOR_WHITE"
-    echo "  web-status - Статус в JSON"
-    echo "  web-start  - Запуск с JSON ответом"
-    echo "  web-stop   - Остановка с JSON ответом"
-    echo -e "$COLOR_GREEN" "Переменные окружения: $COLOR_WHITE"
-    echo "  PPPN_CONFIG      - путь к конфигу"
-    echo "  PPPN_APP_NAME    - имя приложения"
-    echo "  PPPN_BINARY_PATH - путь к бинарнику"
+    echo "  web_start - Запуск веб интерфейса"
 	echo ""
+}
+web_start()
+{
+	load_config
+	echo "Запускаем сервер: $(nvram get lan_ipaddr 2>&1):$APP_SERVER_PORT"
+	php8-cli -S 0.0.0.0:$APP_SERVER_PORT -t "$APP_BASE_DIR/web"
 }
 
 case $1 in
@@ -121,6 +122,9 @@ case $1 in
     help)
         help
         ;;
+	web_start)
+		web_start
+		;;
 	*)
 		echo ""
 		echo -e "$COLOR_RED ✗ $COLOR_WHITEНеизвестная команда: $COLOR_RED$1$COLOR_WHITE."
