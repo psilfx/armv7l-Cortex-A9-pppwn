@@ -1,7 +1,12 @@
 <h1>PPPwn под armv7l.</h1>
 <p>Протестировано на FreshTomato</p>
 <p>file: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), statically linked, with debug_info, not stripped</p>
-
+<p>Установка:</p>
+<kbd><br> git clone https://github.com/psilfx/armv7l-Cortex-A9-pppwn <br><br>
+   mv armv7l-Cortex-A9-pppwn pppwn <br><br>
+   cd pppwn <br><br>
+   sh install.sh <br><br>
+</kbd>
 <h2>Проверен и работает на Netgear r7000 Nighthawk.</h2>
 
 <p>Собрано из исходников от <a href="https://github.com/xfangfang/PPPwn_cpp">xfangfang</a> .</p>
