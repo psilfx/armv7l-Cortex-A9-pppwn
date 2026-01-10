@@ -3,7 +3,7 @@
 APP_BASE_DIR=$(jq -r .basedir /opt/etc/pppwn.config.json)
 FILE_BIN="/opt/bin/pppwn"
 FILE_CFG="/opt/etc/pppwn.config.json"
-FILE_CTL"/opt/etc/pppwn_ctl"
+FILE_CTL="/opt/etc/pppwn_ctl"
 
 echo ""
 echo "Удаляем бинарника... $FILE_BIN"
@@ -34,7 +34,7 @@ else
 fi
 echo ""
 echo "$FILE_BIN"
-echo "$FILE_CTL"
+echo "$FILE_CFG"
 echo "$FILE_CTL"
 echo ""
 echo "Файлы были удалены."
